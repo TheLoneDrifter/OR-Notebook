@@ -96,10 +96,13 @@
       </div>
     </div>
   </div>
+
+<!-- app scripts -->
+<script src="/app.js"></script>
 <script>
-/* Inline app script remains (folders, notes, preview, etc.)
-   I removed the theme toggle logic here; theme is applied by app.js to centralize behavior.
-   Note: app.js is loaded after this script and will apply the stored theme and listen for changes.
+/* Main app script (folders, notes, preview, etc.)
+   Updated to wire in ORApp.sendNoteMessage and listen for or:noteMessage for live updates and sharing.
+   Kept structure similar to earlier for minimal risk.
 */
 
 /* helpers */
@@ -129,7 +132,6 @@ const modalBackdrop = qs('#modalBackdrop');
 const modalMessage = qs('#modalMessage');
 const modalOk = qs('#modalOk');
 const modalCancel = qs('#modalCancel');
-const themeColorMeta = document.getElementById('themeColorMeta');
 
 /* storage helpers */
 function loadFolders(){
@@ -150,19 +152,18 @@ function loadFolders(){
 }
 function saveFolders(f){ localStorage.setItem('or_folders', JSON.stringify(f)); }
 function loadNotesMap(){ try { const raw = localStorage.getItem('or_notes'); return raw?JSON.parse(raw):{}; } catch(e) { return {}; } }
-function saveNotesMap(map){ localStorage.setItem('or_notes', JSON.stringify(map)); }
+function saveNotesMap(map){ localStorage.setItem('or_notes', JSON.stringify(map)); window.dispatchEvent(new Event('or:notesChanged')); }
 
+/* app state */
 let folders = loadFolders();
 let notesMap = loadNotesMap();
 let currentFolderId = localStorage.getItem('or_currentFolder') || (folders[0] && folders[0].id);
 if(!currentFolderId || !folders.find(f => f.id === currentFolderId)) currentFolderId = (folders[0] && folders[0].id);
 
-/* expanded state */
 function loadExpandedState(){ try{ const raw = localStorage.getItem('or_expandedFolders'); const arr = raw ? JSON.parse(raw) : []; return new Set(Array.isArray(arr)?arr:[]); }catch(e){ return new Set(); } }
 function saveExpandedState(){ try{ localStorage.setItem('or_expandedFolders', JSON.stringify(Array.from(expandedFolders))); }catch(e){} }
 const expandedFolders = loadExpandedState();
 
-/* escape html */
 function escapeHtml(s){
   if(s === null || s === undefined) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
@@ -341,9 +342,14 @@ function loadNotes(){
     filtered.forEach(n=>{
       const card=document.createElement('div'); card.className='note-card'; card.draggable=true; card.dataset.id=n.id;
       const excerpt=(n.text||'').slice(0,140);
-      card.innerHTML = `<div><div class="note-title">${escapeHtml(n.title||'Untitled')}</div><div class="note-body" style="color:var(--muted-text);font-size:13px">${escapeHtml(excerpt)}${(n.text||'').length>140?'…':''}</div></div><div class="note-meta"><div style="display:flex;gap:8px;align-items:center"><div style="font-size:12px;color:var(--muted-text)">${new Date(n.updated||n.created).toLocaleString()}</div></div><div class="note-actions"><button class="small-btn" data-act="open">Open</button><button class="small-btn" data-act="delete">Delete</button></div></div><div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${escapeHtml(t)}</span>`).join('')}</div>`;
+      card.innerHTML = `<div><div class="note-title">${escapeHtml(n.title||'Untitled')}</div><div class="note-body" style="color:var(--muted-text);font-size:13px">${escapeHtml(excerpt)}${(n.text||'').length>140?'…':''}</div></div><div class="note-meta"><div style="display:flex;gap:8px;align-items:center"><div style="font-size:12px;color:var(--muted-text)">${new Date(n.updated||n.created).toLocaleString()}</div></div><div class="note-actions"><button class="small-btn" data-act="open">Open</button><button class="small-btn" data-act="share">Share</button><button class="small-btn" data-act="delete">Delete</button></div></div><div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${escapeHtml(t)}</span>`).join('')}</div>`;
+      // open
       card.querySelector('[data-act="open"]').addEventListener('click', ()=>openNoteForEdit(n.id));
-      card.querySelector('[data-act="delete"]').addEventListener('click', async ()=>{ const ok = await showConfirm('Delete note "'+(n.title||'Untitled')+'"?' ); if(!ok) return; const arrAll = notesMap[currentFolderId]||[]; const idx = arrAll.findIndex(x=>x.id===n.id); if(idx>-1){ arrAll.splice(idx,1); saveNotesMap(notesMap); loadNotes(); updateTagFilters(); } });
+      // share
+      card.querySelector('[data-act="share"]').addEventListener('click', ()=>shareNote(n));
+      // delete
+      card.querySelector('[data-act="delete"]').addEventListener('click', async ()=>{ const ok = await showConfirm('Delete note "'+(n.title||'Untitled')+'"?' ); if(!ok) return; const arrAll = notesMap[currentFolderId]||[]; const idx = arrAll.findIndex(x=>x.id===n.id); if(idx>-1){ arrAll.splice(idx,1); saveNotesMap(notesMap); // broadcast deletion
+          try{ window.ORApp && window.ORApp.sendNoteMessage('deleted', { folderId: currentFolderId, id: n.id }); }catch(e){} loadNotes(); updateTagFilters(); } });
       card.addEventListener('dblclick', ()=>openNoteForEdit(n.id));
       card.addEventListener('dragstart', ev=>{ card.classList.add('dragging'); try{ ev.dataTransfer.setData('application/x-note', JSON.stringify({ id:n.id, fromFolderId: currentFolderId })); }catch(e){} ev.dataTransfer.effectAllowed='move'; });
       card.addEventListener('dragend', ()=>card.classList.remove('dragging'));
@@ -353,6 +359,27 @@ function loadNotes(){
     renderFolders();
     notesGrid.classList.add('fade-enter'); setTimeout(()=>notesGrid.classList.remove('fade-enter'),380);
   },120);
+}
+
+/* sharing helper for a note (UI opens the ORApp.shareNoteData helper) */
+async function shareNote(n){
+  try{
+    const result = await (window.ORApp && window.ORApp.shareNoteData ? window.ORApp.shareNoteData(n) : Promise.resolve({ok:false}));
+    if(result && result.ok){
+      // show a small ephemeral feedback (use modal for now)
+      modalMessage.textContent = result.method === 'share' ? 'Shared via system share' : (result.method === 'clipboard' ? 'Copied note to clipboard' : 'Downloaded note');
+      modalBackdrop.style.display = 'flex';
+      setTimeout(()=> modalBackdrop.style.display = 'none', 1400);
+    } else {
+      modalMessage.textContent = 'Could not share note';
+      modalBackdrop.style.display = 'flex';
+      setTimeout(()=> modalBackdrop.style.display = 'none', 1400);
+    }
+  }catch(e){
+    modalMessage.textContent = 'Could not share note';
+    modalBackdrop.style.display = 'flex';
+    setTimeout(()=> modalBackdrop.style.display = 'none', 1400);
+  }
 }
 
 /* CRUD */
@@ -365,6 +392,8 @@ function createNote(){
   if(!notesMap[currentFolderId]) notesMap[currentFolderId]=[];
   notesMap[currentFolderId].push(note);
   saveNotesMap(notesMap);
+  // broadcast create
+  try{ window.ORApp && window.ORApp.sendNoteMessage('created', { folderId: currentFolderId, note }); }catch(e){}
   noteTitle.value=''; noteBody.value=''; tagInput.value='';
   loadNotes(); updateTagFilters(); noteBody.focus();
 }
@@ -376,7 +405,8 @@ function updateNoteFromEditor(){
   const editing = saveNoteBtn.getAttribute('data-editing'); const tags = parseTags(tagInput.value);
   if(editing){
     const arr = notesMap[currentFolderId]||[]; const idx = arr.findIndex(x=>x.id===editing);
-    if(idx>-1){ arr[idx].title = noteTitle.value || arr[idx].title; arr[idx].text = noteBody.value || ''; arr[idx].tags = tags; arr[idx].updated = Date.now(); saveNotesMap(notesMap); saveNoteBtn.removeAttribute('data-editing'); }
+    if(idx>-1){ arr[idx].title = noteTitle.value || arr[idx].title; arr[idx].text = noteBody.value || ''; arr[idx].tags = tags; arr[idx].updated = Date.now(); saveNotesMap(notesMap); // broadcast update
+        try{ window.ORApp && window.ORApp.sendNoteMessage('updated', { folderId: currentFolderId, note: arr[idx] }); }catch(e){} saveNoteBtn.removeAttribute('data-editing'); }
     else { createNote(); saveNoteBtn.removeAttribute('data-editing'); }
   } else { createNote(); }
   loadNotes(); updateTagFilters();
@@ -395,10 +425,10 @@ function moveNoteBetweenFolders(noteId, fromFolderId, toFolderId){
   notesMap[toFolderId].push(note);
   saveNotesMap(notesMap);
   expandedFolders.add(toFolderId); saveExpandedState();
+  // broadcast move
+  try{ window.ORApp && window.ORApp.sendNoteMessage('moved', { fromFolderId, toFolderId, noteId }); }catch(e){}
   loadNotes(); updateTagFilters();
 }
-
-/* drop handlers already added earlier for folderList */
 
 /* toolbar actions already wired earlier */
 qsa('.md-btn').forEach(btn => btn.addEventListener('click', ()=>{ applyMdAction(btn.dataset.action); }));
@@ -466,6 +496,112 @@ document.addEventListener('click', (e)=>{ if(!currentInlineEditor) return; const
 /* update folder header */
 function updateFolderHeader(){ const f = folders.find(x=>x.id===currentFolderId); currentFolderName.textContent = f ? f.name : '(none)'; }
 
+/* Listen for cross-tab note messages (or:noteMessage fired by app.js when a BC/SW/storage message arrives) */
+window.addEventListener('or:noteMessage', (e) => {
+  const d = e.detail || {};
+  if(!d || !d.type) return;
+  const type = d.type; const payload = d.payload || {};
+
+  switch(type){
+    case 'note-created': {
+      const folderId = payload.folderId;
+      const note = payload.note;
+      if(!folderId || !note) return;
+      if(!notesMap[folderId]) notesMap[folderId]=[];
+      // avoid duplicates
+      if(!(notesMap[folderId]||[]).some(n => n.id === note.id)){
+        notesMap[folderId].push(note);
+        saveNotesMap(notesMap);
+        loadNotes();
+        updateTagFilters();
+      }
+      break;
+    }
+    case 'note-updated': {
+      const folderId = payload.folderId;
+      const note = payload.note;
+      if(!folderId || !note) return;
+      const arr = notesMap[folderId] || [];
+      const idx = arr.findIndex(x=>x.id === note.id);
+      if(idx > -1){
+        // if user is editing this same note, check for conflicts
+        const editing = saveNoteBtn.getAttribute('data-editing');
+        if(editing === note.id){
+          // if local differs from remote, ask user
+          const localText = noteBody.value || '';
+          const localTitle = noteTitle.value || '';
+          const remoteText = note.text || '';
+          const remoteTitle = note.title || '';
+          if(localText !== remoteText || localTitle !== remoteTitle){
+            showConfirm('This note was updated in another tab. Overwrite your local edits with the remote version?').then(ok=>{
+              if(ok){
+                arr[idx] = note;
+                saveNotesMap(notesMap);
+                // apply remote into editor
+                if(currentFolderId === folderId){
+                  noteTitle.value = note.title;
+                  noteBody.value = note.text;
+                  tagInput.value = (note.tags||[]).join(', ');
+                  renderPreview();
+                  loadNotes();
+                  updateTagFilters();
+                }
+              } else {
+                // keep local; still update stored version so when user saves it'll broadcast; do not overwrite
+              }
+            });
+          } else {
+            // identical, simply update timestamp
+            arr[idx] = note;
+            saveNotesMap(notesMap);
+            loadNotes();
+            updateTagFilters();
+          }
+        } else {
+          // not actively editing, just update store and UI
+          arr[idx] = note;
+          saveNotesMap(notesMap);
+          loadNotes();
+          updateTagFilters();
+        }
+      } else {
+        // new to this tab — add it
+        if(!notesMap[folderId]) notesMap[folderId]=[];
+        notesMap[folderId].push(note);
+        saveNotesMap(notesMap);
+        loadNotes();
+        updateTagFilters();
+      }
+      break;
+    }
+    case 'note-deleted': {
+      const folderId = payload.folderId;
+      const id = payload.id;
+      if(!folderId || !id) return;
+      const arr = notesMap[folderId] || [];
+      const idx = arr.findIndex(x=>x.id === id);
+      if(idx>-1){ arr.splice(idx,1); saveNotesMap(notesMap); loadNotes(); updateTagFilters(); }
+      break;
+    }
+    case 'note-moved': {
+      const { fromFolderId, toFolderId, noteId } = payload;
+      if(!fromFolderId || !toFolderId || !noteId) return;
+      const from = notesMap[fromFolderId] || [];
+      const idx = from.findIndex(x=>x.id === noteId);
+      if(idx>-1){
+        const [note] = from.splice(idx,1);
+        if(!notesMap[toFolderId]) notesMap[toFolderId] = [];
+        notesMap[toFolderId].push(note);
+        saveNotesMap(notesMap);
+        loadNotes(); updateTagFilters();
+      }
+      break;
+    }
+  }
+});
+
+/* updateTagFilters call is used across app */
+
 /* Expose small API for debugging */
 window.orNotebook = { folders, notesMap, renderFolders, loadNotes, expandedFolders };
 
@@ -480,9 +616,6 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
-
-<!-- Enhancement & offline autocomplete + theme script -->
-<script src="/app.js"></script>
 
 </body>
 </html>

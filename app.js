@@ -1,17 +1,20 @@
 // app.js - Theme broadcast + offline "autocomplete on Tab" and settings helpers.
+// Extended: cross-tab note messaging & note share handling helper.
 //
 // Responsibilities:
 //  - Apply saved theme on load and update the <meta name="theme-color">.
 //  - Listen for theme changes via BroadcastChannel and service-worker messages and apply them live.
 //  - Offer a small API for the settings page to set theme and broadcast changes.
+//  - Provide BroadcastChannel + SW fallback for note messages (create/update/delete/move).
 //  - Keep the offline autocomplete-on-Tab implementation for the editor.
+//  - Expose helper methods for sharing notes.
 
-// ---------- Theme handling & cross-window live updates ----------
 const THEME_KEY = 'or_theme';
 const AUTOKEY = 'or_autocomplete_tab';
-const BC_NAME = 'or-theme';
+const BC_THEME_NAME = 'or-theme';
+const BC_NOTES_NAME = 'or-notes';
 
-// Apply theme to document
+// ---------- Theme handling & cross-window live updates ----------
 function updateThemeMetaForMode(mode){
   const themeColorMeta = document.getElementById('themeColorMeta');
   if(!themeColorMeta) return;
@@ -27,60 +30,41 @@ function applyThemeValue(t){
   updateThemeMetaForMode(mode);
 }
 
-// Broadcast changes to other contexts (BroadcastChannel + serviceWorker)
 function broadcastThemeChange(themeValue){
-  // BroadcastChannel first (preferred, fast)
   try{
     if('BroadcastChannel' in self){
-      const bc = new BroadcastChannel(BC_NAME);
+      const bc = new BroadcastChannel(BC_THEME_NAME);
       bc.postMessage({ type: 'theme-change', theme: themeValue });
-      // close quickly - recipients will still get it
       bc.close();
     }
-  }catch(e){
-    // ignore
-  }
-
-  // Also post message to ServiceWorker to let it forward to clients if needed
+  }catch(e){}
   if(navigator.serviceWorker && navigator.serviceWorker.controller){
-    try{
-      navigator.serviceWorker.controller.postMessage({ type: 'theme-change', theme: themeValue });
-    }catch(e){}
+    try{ navigator.serviceWorker.controller.postMessage({ type: 'theme-change', theme: themeValue }); }catch(e){}
   }
-
-  // Also set localStorage (ensures storage events for other tabs that don't support BroadcastChannel)
   try { localStorage.setItem(THEME_KEY, themeValue); } catch(e){}
 }
 
-// Listen for incoming theme messages
 function setupThemeListeners(){
-  // BroadcastChannel listener (persistent on this page)
   if('BroadcastChannel' in self){
     try{
-      const bc = new BroadcastChannel(BC_NAME);
+      const bc = new BroadcastChannel(BC_THEME_NAME);
       bc.onmessage = (ev) => {
         const d = ev.data || {};
         if(d && d.type === 'theme-change') applyThemeValue(d.theme);
       };
     }catch(e){}
   }
-
-  // Service worker messages (SW can forward theme-change to clients)
   if(navigator.serviceWorker){
     navigator.serviceWorker.addEventListener && navigator.serviceWorker.addEventListener('message', (ev) => {
       const d = ev.data || {};
       if(d && d.type === 'theme-change') applyThemeValue(d.theme);
     });
   }
-
-  // localStorage fallback for tabs (storage event)
   window.addEventListener('storage', (e) => {
     if(e.key === THEME_KEY && e.newValue){
       applyThemeValue(e.newValue);
     }
   });
-
-  // If system preference changes and user selected "system", update active theme
   if(window.matchMedia){
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev) => {
       const cur = localStorage.getItem(THEME_KEY) || 'system';
@@ -88,8 +72,6 @@ function setupThemeListeners(){
     });
   }
 }
-
-// Small API for settings page and others
 function getThemeSetting(){ return localStorage.getItem(THEME_KEY) || 'system'; }
 function setThemeSetting(v){
   localStorage.setItem(THEME_KEY, v);
@@ -97,11 +79,71 @@ function setThemeSetting(v){
   broadcastThemeChange(v);
 }
 
-// Initialize theme on load
-document.addEventListener('DOMContentLoaded', ()=>{
-  applyThemeValue(getThemeSetting());
-  setupThemeListeners();
-});
+// ---------- Notes cross-tab messaging ----------
+function setupNotesBroadcasting(){
+  // Listen via BroadcastChannel if available
+  if('BroadcastChannel' in self){
+    try{
+      const bc = new BroadcastChannel(BC_NOTES_NAME);
+      bc.onmessage = (ev) => {
+        const d = ev.data || {};
+        // normalize and dispatch as custom event for the app
+        if(d && d.type && d.type.startsWith('note-')){
+          window.dispatchEvent(new CustomEvent('or:noteMessage', { detail: d }));
+        }
+      };
+    }catch(e){}
+  }
+
+  // Listen to service-worker forwarded messages
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.addEventListener && navigator.serviceWorker.addEventListener('message', (ev) => {
+      const d = ev.data || {};
+      if(d && d.type && d.type.startsWith('note-')){
+        window.dispatchEvent(new CustomEvent('or:noteMessage', { detail: d }));
+      }
+    });
+  }
+
+  // Storage fallback for tabs that don't get BroadcastChannel: uses a timestamped key to indicate updates
+  window.addEventListener('storage', (e) => {
+    // We'll store a serialized payload in or_notes_update_payload for fallback (stringified)
+    if(e.key === 'or_notes_update_payload' && e.newValue){
+      try{
+        const d = JSON.parse(e.newValue);
+        if(d && d.type && d.type.startsWith('note-')){
+          window.dispatchEvent(new CustomEvent('or:noteMessage', { detail: d }));
+        }
+      }catch(e){}
+    }
+  });
+}
+
+function sendNoteMessage(action, payload){
+  const type = 'note-' + action; // 'note-updated', 'note-created', 'note-deleted', 'note-moved'
+  const message = { type, payload, ts: Date.now() };
+
+  // BroadcastChannel
+  try{
+    if('BroadcastChannel' in self){
+      const bc = new BroadcastChannel(BC_NOTES_NAME);
+      bc.postMessage(message);
+      bc.close();
+    }
+  }catch(e){}
+
+  // Service worker fallback
+  if(navigator.serviceWorker && navigator.serviceWorker.controller){
+    try{ navigator.serviceWorker.controller.postMessage(message); }catch(e){}
+  }
+
+  // localStorage fallback for other tabs
+  try{
+    localStorage.setItem('or_notes_update_payload', JSON.stringify(message));
+    // also maintain an update timestamp in case size-limited storages trim payload
+    localStorage.setItem('or_notes_update_ts', String(Date.now()));
+  }catch(e){}
+}
 
 // ---------- Autocomplete-on-Tab (offline) ----------
 function isAutocompleteEnabled(){
@@ -207,8 +249,56 @@ function attachAutocompleteToTextarea(textarea){
   });
 }
 
-// Attach to noteBody if present on load
+// ---------- Sharing helpers ----------
+async function shareNoteData(note){
+  const title = note.title || 'Untitled';
+  const text = (note.text || '');
+  const payloadText = `# ${title}\n\n${text}`;
+
+  // Try Web Share API
+  if(navigator.share){
+    try{
+      await navigator.share({ title, text: payloadText });
+      return { ok: true, method: 'share' };
+    }catch(e){
+      // share failed or user cancelled, fallthrough to clipboard
+    }
+  }
+
+  // Try copy to clipboard
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try{
+      await navigator.clipboard.writeText(payloadText);
+      return { ok: true, method: 'clipboard' };
+    }catch(e){
+      // fallthrough to download
+    }
+  }
+
+  // Fallback: create downloadable blob
+  try{
+    const blob = new Blob([payloadText], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const safeTitle = (title || 'note').replace(/[^\w\-]+/g,'_').slice(0,60) || 'note';
+    a.download = safeTitle + '.md';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    return { ok: true, method: 'download' };
+  }catch(e){
+    return { ok: false, error: e && e.message };
+  }
+}
+
+// ---------- Initialization ----------
 document.addEventListener('DOMContentLoaded', ()=>{
+  applyThemeValue(getThemeSetting());
+  setupThemeListeners();
+  setupNotesBroadcasting();
+
   const noteTA = document.getElementById('noteBody');
   if(noteTA) attachAutocompleteToTextarea(noteTA);
 });
@@ -220,8 +310,7 @@ window.ORApp = {
   isAutocompleteEnabled,
   setAutocompleteEnabled,
   buildDictionarySync,
-  findCompletion
+  findCompletion,
+  sendNoteMessage,
+  shareNoteData
 };
-
-// If service worker receives a message it will forward to clients; the SW code also does that.
-// app.js listens to SW messages above via navigator.serviceWorker.addEventListener.

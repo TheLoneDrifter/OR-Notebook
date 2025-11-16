@@ -1,6 +1,5 @@
 /* Unified stylesheet for OR Notebook (index + settings)
-   Contains variables, theming, layout, components, dropdown, and scrollbars.
-   (Updated: improved custom dropdown styling and dropdown-specific scrollbar.)
+   Contains variables, theming, layout, components, dropdown, scrollbars and note/action button styles.
 */
 
 /* Core variables */
@@ -40,6 +39,13 @@
   --select-option-hover-bg: linear-gradient(90deg,var(--accent),var(--accent-2));
   --select-option-hover-color: #ffffff;
   --select-shadow: 0 8px 30px rgba(0,0,0,0.08);
+
+  /* action buttons */
+  --action-bg: rgba(0,0,0,0.03);
+  --action-border: rgba(0,0,0,0.06);
+  --open-color: #2563eb;
+  --share-color: #16a34a;
+  --delete-color-btn: #d64545;
 }
 
 /* Dark overrides */
@@ -171,6 +177,23 @@ body{margin:0;font-family:Inter,Segoe UI,Roboto,system-ui,Arial;background:var(-
 .note-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .note-tag{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border)}
 
+/* Note action buttons - styled pill icons */
+.note-actions{display:flex;gap:8px;align-items:center}
+.small-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1px solid var(--action-border);background:var(--action-bg);cursor:pointer;color:var(--text);font-size:13px;
+  transition:transform .08s ease,box-shadow .08s ease,background .12s;
+}
+.small-btn:focus{ outline:2px solid rgba(79,124,255,0.12); outline-offset:2px; }
+.small-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+
+/* Open (blue) */
+.small-btn[data-act="open"]{ border-color: rgba(37,99,235,0.12); color:var(--open-color); background: linear-gradient(180deg, rgba(37,99,235,0.06), rgba(79,124,255,0.03)); }
+/* Share (green) */
+.small-btn[data-act="share"]{ border-color: rgba(16,163,74,0.12); color:var(--share-color); background: linear-gradient(180deg, rgba(16,163,74,0.04), rgba(16,163,74,0.02)); }
+/* Delete (red) */
+.small-btn[data-act="delete"]{ border-color: rgba(214,69,69,0.12); color:var(--delete-color-btn); background: linear-gradient(180deg, rgba(214,69,69,0.03), rgba(214,69,69,0.01)); }
+.small-btn[data-act="delete"]:hover{ background: linear-gradient(180deg, rgba(214,69,69,0.06), rgba(214,69,69,0.02)); }
+
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--modal-bg);z-index:1100}
 .modal{background:var(--surface);padding:16px;border-radius:10px;border:1px solid var(--border);min-width:320px;max-width:90%;color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,0.12)}
@@ -228,8 +251,8 @@ button{ -webkit-tap-highlight-color: transparent; }
   padding:10px 12px;border-radius:8px;cursor:pointer;margin:6px 4px;color:var(--select-color);
   transition: background .12s ease, color .12s ease;
 }
-.cs-option:hover{ background: var(--select-option-hover-bg); color: var(--select-option-hover-color); }
-.cs-option.active{ background: var(--select-option-hover-bg); color: var(--select-option-hover-color); }
+.cs-option:hover{ background:var(--select-option-hover-bg); color: var(--select-option-hover-color); }
+.cs-option.active{ background:var(--select-option-hover-bg); color: var(--select-option-hover-color); }
 
 /* keyboard focus for options */
 .cs-option:focus{ outline:2px solid rgba(79,124,255,0.12); outline-offset:2px; }

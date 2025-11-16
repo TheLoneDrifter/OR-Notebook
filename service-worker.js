@@ -1,4 +1,4 @@
-// Simple service worker: app-shell caching strategy (updated to cache unified stylesheet and handle theme-change messages)
+// Simple service worker: app-shell caching strategy (updated to cache unified stylesheet and handle theme-change and note-* messages)
 const CACHE_NAME = 'or-notebook-v2';
 const ASSETS = [
   '/', // navigation fallback
@@ -26,14 +26,16 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Service worker will forward incoming theme-change messages to all clients
+// Service worker will forward incoming messages (theme-change and note-*) to all clients
 self.addEventListener('message', event => {
   const data = event.data || {};
-  if(data && data.type === 'theme-change'){
-    const theme = data.theme;
+  if(!data || !data.type) return;
+  // forward to clients any important events
+  if(data.type === 'theme-change' || (typeof data.type === 'string' && data.type.startsWith('note-'))){
+    const payload = data;
     self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
       clients.forEach(c => {
-        try { c.postMessage({ type: 'theme-change', theme }); } catch(e){}
+        try { c.postMessage(payload); } catch(e){}
       });
     });
   }
