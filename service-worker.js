@@ -13,7 +13,7 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS.map(s => new Request(s, {cache: 'reload'}))).catch(() => Promise.resolve());
+      return cache.addAll(ASSETS.map(s => new Request(s, { cache: 'reload' }))).catch(() => Promise.resolve());
     }).then(() => self.skipWaiting())
   );
 });
@@ -29,13 +29,13 @@ self.addEventListener('activate', event => {
 // Service worker will forward incoming messages (theme-change and note-*) to all clients
 self.addEventListener('message', event => {
   const data = event.data || {};
-  if(!data || !data.type) return;
+  if (!data || !data.type) return;
   // forward to clients any important events
-  if(data.type === 'theme-change' || (typeof data.type === 'string' && data.type.startsWith('note-'))){
+  if (data.type === 'theme-change' || (typeof data.type === 'string' && data.type.startsWith('note-'))) {
     const payload = data;
     self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
       clients.forEach(c => {
-        try { c.postMessage(payload); } catch(e){}
+        try { c.postMessage(payload); } catch (e) { }
       });
     });
   }

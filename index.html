@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>OR Notebook — Modern</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OR Notebook — Modern</title>
 
-<!-- PWA manifest & icons -->
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="favicon.svg">
+  <!-- PWA manifest & icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
 
-<!-- Unified stylesheet -->
-<link rel="stylesheet" href="/styles.css">
+  <!-- Unified stylesheet -->
+  <link rel="stylesheet" href="/styles.css">
 
-<!-- Marked.js for markdown parsing -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<!-- DOMPurify for sanitizing HTML produced by marked -->
-<script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-<meta name="theme-color" content="#f5f7fb" id="themeColorMeta">
+  <!-- Marked.js for markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- DOMPurify for sanitizing HTML produced by marked -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+
+  <meta name="theme-color" content="#f5f7fb" id="themeColorMeta">
 </head>
+
 <body>
   <div class="header">
     <div style="display:flex;align-items:center;gap:12px">
-      <button id="mobileFoldersBtn" class="mobile-folders-btn" aria-label="Toggle folders">☰</button>
+      <button id="mobileFoldersBtn" class="mobile-folders-btn" aria-label="Toggle folders"><i
+          class="bi bi-list"></i></button>
       <h1 style="margin:0;font-size:18px">OR Notebook</h1>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <a id="settingsLink" href="/settings" class="btn" title="Settings">⚙ Settings</a>
+      <a id="settingsLink" href="/settings" class="btn" title="Settings"><i class="bi bi-gear"></i></a>
     </div>
   </div>
 
@@ -40,7 +46,7 @@
 
       <div id="folderList" class="folder-list" aria-label="Folders"></div>
 
-      <button id="addFolder" class="folder-add">+ Add Folder</button>
+      <button id="addFolder" class="folder-add"><i class="bi bi-folder-plus"></i></button>
     </aside>
 
     <main class="main">
@@ -48,27 +54,31 @@
         <input id="search" class="search" placeholder="Search notes, tags, titles..." aria-label="Search notes" />
         <div class="tag-filter" id="tagFilter" aria-label="Tag filters"></div>
         <!-- Import button (opens hidden file picker) -->
-        <button id="importBtn" class="btn" title="Import Markdown">⬆ Import</button>
-        <button id="newNoteBtn" class="btn">New Note</button>
+        <button id="importBtn" class="btn" title="Import Markdown"><i class="bi bi-upload"></i></button>
+        <button id="newNoteBtn" class="btn"><i class="bi bi-file-earmark-plus"></i></button>
         <!-- hidden file input for importing markdown files -->
-        <input id="mdFileInput" type="file" accept=".md,.markdown,text/markdown,application/markdown" multiple style="display:none" />
+        <input id="mdFileInput" type="file" accept=".md,.markdown,text/markdown,application/markdown" multiple
+          style="display:none" />
       </div>
 
       <div class="editor" role="region" aria-label="Editor area">
         <div class="editor-left">
           <div class="toolbar-md" role="toolbar" aria-label="Formatting">
-            <button class="md-btn" data-action="bold" title="Bold">B</button>
-            <button class="md-btn" data-action="italic" title="Italic">I</button>
-            <button class="md-btn" data-action="h1" title="Heading">H1</button>
-            <button class="md-btn" data-action="code" title="Inline code">{ }</button>
-            <button class="md-btn" data-action="ul" title="Unordered list">• List</button>
-            <button class="md-btn" data-action="link" title="Link">Link</button>
+            <button class="md-btn" data-action="bold" title="Bold"><i class="bi bi-type-bold"></i></button>
+            <button class="md-btn" data-action="italic" title="Italic"><i class="bi bi-type-italic"></i></button>
+            <button class="md-btn" data-action="h1" title="Heading"><i class="bi bi-type-h1"></i></button>
+            <button class="md-btn" data-action="code" title="Inline code"><i class="bi bi-braces"></i></button>
+            <button class="md-btn" data-action="ul" title="Unordered list"><i class="bi bi-list-ul"></i></button>
+            <button class="md-btn" data-action="link" title="Link"><i class="bi bi-link-45deg"></i></button>
           </div>
           <input id="noteTitle" class="title-input" placeholder="Note title" aria-label="Note title" />
-          <textarea id="noteBody" class="textarea" placeholder="Write your note using Markdown..." aria-label="Note body"></textarea>
+          <textarea id="noteBody" class="textarea" placeholder="Write your note using Markdown..."
+            aria-label="Note body"></textarea>
           <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <input id="tagInput" placeholder="Add tags (comma separated)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)" aria-label="Tags" />
-            <button id="saveNote" class="btn">Save</button>
+            <input id="tagInput" placeholder="Add tags (comma separated)"
+              style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)"
+              aria-label="Tags" />
+            <button id="saveNote" class="btn"><i class="bi bi-floppy"></i></button>
           </div>
         </div>
 
@@ -101,573 +111,580 @@
     </div>
   </div>
 
-<!-- app scripts -->
-<script src="/app.js"></script>
-<script>
-/* Main app script (folders, notes, preview, etc.)
-   Updated to wire in ORApp.sendNoteMessage and listen for or:noteMessage for live updates and sharing.
-   Kept structure similar to earlier for minimal risk.
-*/
+  <!-- app scripts -->
+  <script src="/app.js"></script>
+  <script>
+    /* Main app script (folders, notes, preview, etc.)
+       Updated to wire in ORApp.sendNoteMessage and listen for or:noteMessage for live updates and sharing.
+       Kept structure similar to earlier for minimal risk.
+    */
 
-/* helpers */
-const uid = (p='n')=>p+'_'+Math.random().toString(36).slice(2,9);
-const qs = s => document.querySelector(s);
-const qsa = s => Array.from(document.querySelectorAll(s));
+    /* helpers */
+    const uid = (p = 'n') => p + '_' + Math.random().toString(36).slice(2, 9);
+    const qs = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
 
-/* DOM refs */
-const folderList = qs('#folderList');
-const addFolderBtn = qs('#addFolder');
-const folderCountEl = qs('#folderCount');
-const newNoteBtn = qs('#newNoteBtn');
-const importBtn = qs('#importBtn');
-const mdFileInput = qs('#mdFileInput');
-const noteTitle = qs('#noteTitle');
-const noteBody = qs('#noteBody');
-const saveNoteBtn = qs('#saveNote');
-const notesGrid = qs('#notesGrid');
-const preview = qs('#preview');
-const notesCount = qs('#notesCount');
-const currentFolderName = qs('#currentFolderName');
-const searchInput = qs('#search');
-const tagInput = qs('#tagInput');
-const tagFilter = qs('#tagFilter');
-const mobileFoldersBtn = qs('#mobileFoldersBtn');
-const sidebar = qs('#sidebar');
+    /* DOM refs */
+    const folderList = qs('#folderList');
+    const addFolderBtn = qs('#addFolder');
+    const folderCountEl = qs('#folderCount');
+    const newNoteBtn = qs('#newNoteBtn');
+    const importBtn = qs('#importBtn');
+    const mdFileInput = qs('#mdFileInput');
+    const noteTitle = qs('#noteTitle');
+    const noteBody = qs('#noteBody');
+    const saveNoteBtn = qs('#saveNote');
+    const notesGrid = qs('#notesGrid');
+    const preview = qs('#preview');
+    const notesCount = qs('#notesCount');
+    const currentFolderName = qs('#currentFolderName');
+    const searchInput = qs('#search');
+    const tagInput = qs('#tagInput');
+    const tagFilter = qs('#tagFilter');
+    const mobileFoldersBtn = qs('#mobileFoldersBtn');
+    const sidebar = qs('#sidebar');
 
-const modalBackdrop = qs('#modalBackdrop');
-const modalMessage = qs('#modalMessage');
-const modalOk = qs('#modalOk');
-const modalCancel = qs('#modalCancel');
+    const modalBackdrop = qs('#modalBackdrop');
+    const modalMessage = qs('#modalMessage');
+    const modalOk = qs('#modalOk');
+    const modalCancel = qs('#modalCancel');
 
-/* storage helpers */
-function loadFolders(){
-  try {
-    const raw = localStorage.getItem('or_folders');
-    const arr = raw ? JSON.parse(raw) : null;
-    if(!arr || !Array.isArray(arr) || arr.length === 0){
-      const base = [{id:'f_general',name:'General'}];
-      localStorage.setItem('or_folders', JSON.stringify(base));
-      return base;
-    }
-    return arr;
-  } catch(e) {
-    const base = [{id:'f_general',name:'General'}];
-    localStorage.setItem('or_folders', JSON.stringify(base));
-    return base;
-  }
-}
-function saveFolders(f){ localStorage.setItem('or_folders', JSON.stringify(f)); }
-function loadNotesMap(){ try { const raw = localStorage.getItem('or_notes'); return raw?JSON.parse(raw):{}; } catch(e) { return {}; } }
-function saveNotesMap(map){ localStorage.setItem('or_notes', JSON.stringify(map)); window.dispatchEvent(new Event('or:notesChanged')); }
-
-/* app state */
-let folders = loadFolders();
-let notesMap = loadNotesMap();
-let currentFolderId = localStorage.getItem('or_currentFolder') || (folders[0] && folders[0].id);
-if(!currentFolderId || !folders.find(f => f.id === currentFolderId)) currentFolderId = (folders[0] && folders[0].id);
-
-function loadExpandedState(){ try{ const raw = localStorage.getItem('or_expandedFolders'); const arr = raw ? JSON.parse(raw) : []; return new Set(Array.isArray(arr)?arr:[]); }catch(e){ return new Set(); } }
-function saveExpandedState(){ try{ localStorage.setItem('or_expandedFolders', JSON.stringify(Array.from(expandedFolders))); }catch(e){} }
-const expandedFolders = loadExpandedState();
-
-function escapeHtml(s){
-  if(s === null || s === undefined) return '';
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
-}
-
-/* modal confirm */
-function showConfirm(message){
-  return new Promise(resolve => {
-    modalMessage.textContent = message;
-    modalBackdrop.style.display = 'flex';
-    modalOk.focus();
-    function clean(result){
-      modalBackdrop.style.display = 'none';
-      modalOk.removeEventListener('click', onOk);
-      modalCancel.removeEventListener('click', onCancel);
-      modalBackdrop.removeEventListener('keydown', onKey);
-      resolve(result);
-    }
-    function onOk(){ clean(true); }
-    function onCancel(){ clean(false); }
-    function onKey(e){ if(e.key === 'Escape') onCancel(); if(e.key === 'Enter') onOk(); }
-    modalOk.addEventListener('click', onOk);
-    modalCancel.addEventListener('click', onCancel);
-    modalBackdrop.addEventListener('keydown', onKey);
-  });
-}
-
-/* configure marked */
-marked.setOptions({ gfm:true, breaks:false, headerIds:true, mangle:false });
-
-function renderPreview(){
-  const md = noteBody.value || '';
-  if(!md){ preview.innerHTML = '<em style="color:var(--muted-text)">Empty</em>'; return; }
-  try {
-    const raw = marked.parse(md);
-    preview.innerHTML = DOMPurify.sanitize(raw, {USE_PROFILES: {html:true}});
-  } catch(e){
-    preview.innerHTML = '<pre>' + escapeHtml(md) + '</pre>';
-  }
-}
-
-/* inline editor handling */
-let currentInlineEditor = null;
-function cancelInlineEditor(){
-  if(!currentInlineEditor) return;
-  const { el, input, folderObj, original, isNew } = currentInlineEditor;
-  try {
-    if(isNew){ if(el && el.parentNode) el.parentNode.removeChild(el); }
-    else { if(el){ const nameDiv = el.querySelector('.name'); if(nameDiv) nameDiv.textContent = original || (folderObj && folderObj.name) || ''; } }
-  } catch(e){}
-  currentInlineEditor = null;
-}
-
-/* open note from sidebar */
-function openNoteGlobally(folderId, noteId){
-  if(!folders.find(f=>f.id===folderId)) return;
-  currentFolderId = folderId; localStorage.setItem('or_currentFolder', currentFolderId);
-  updateFolderHeader(); renderFolders(); loadNotes();
-  const arr = notesMap[folderId] || []; const n = arr.find(x=>x.id===noteId);
-  if(n){ noteTitle.value = n.title; noteBody.value = n.text; tagInput.value = (n.tags||[]).join(', '); saveNoteBtn.setAttribute('data-editing', noteId); renderPreview(); scrollToTop(); }
-}
-
-/* render folders */
-function renderFolders(){
-  folderList.innerHTML = '';
-  folders.forEach((f,idx) => {
-    const el = document.createElement('div');
-    el.className = 'folder' + (f.id === currentFolderId ? ' active' : '');
-    el.draggable = true;
-    el.dataset.id = f.id;
-
-    const row = document.createElement('div'); row.className='folder-row';
-
-    const toggle = document.createElement('button'); toggle.className='folder-toggle';
-    const isExpanded = expandedFolders.has(f.id);
-    if(isExpanded) toggle.classList.add('expanded');
-    toggle.innerHTML = '▸'; toggle.setAttribute('aria-expanded', String(isExpanded));
-    toggle.addEventListener('click', e=>{ e.stopPropagation(); if(expandedFolders.has(f.id)) expandedFolders.delete(f.id); else expandedFolders.add(f.id); saveExpandedState(); renderFolders(); });
-
-    const nameDiv = document.createElement('div'); nameDiv.className='name'; nameDiv.textContent = f.name;
-    const countDiv = document.createElement('div'); countDiv.className='count'; countDiv.textContent = (notesMap[f.id]||[]).length;
-
-    const actions = document.createElement('div'); actions.className='folder-actions';
-    const renameBtn = document.createElement('button'); renameBtn.setAttribute('title','Rename'); renameBtn.setAttribute('data-act','rename'); renameBtn.innerHTML='✎';
-    const deleteBtn = document.createElement('button'); deleteBtn.setAttribute('title','Delete'); deleteBtn.setAttribute('data-act','delete'); deleteBtn.innerHTML='🗑';
-    const grabDiv = document.createElement('div'); grabDiv.className='grab'; grabDiv.title='Drag to reorder'; grabDiv.innerHTML='☰';
-    actions.appendChild(renameBtn); actions.appendChild(deleteBtn); actions.appendChild(grabDiv);
-
-    row.appendChild(toggle); row.appendChild(nameDiv); row.appendChild(countDiv); row.appendChild(actions);
-    el.appendChild(row);
-
-    // notes under folder
-    const notesContainer = document.createElement('div'); notesContainer.className = 'folder-notes' + (isExpanded ? ' show' : '');
-    const notesArr = (notesMap[f.id] || []).slice().reverse();
-    notesArr.forEach(n => {
-      const noteRow = document.createElement('div'); noteRow.className='folder-note';
-      const t = document.createElement('div'); t.className='title'; t.textContent = n.title || 'Untitled';
-      const m = document.createElement('div'); m.className='meta'; m.textContent = new Date(n.updated || n.created).toLocaleDateString();
-      noteRow.appendChild(t); noteRow.appendChild(m);
-      noteRow.addEventListener('click', ev=>{ ev.stopPropagation(); openNoteGlobally(f.id, n.id); if(window.innerWidth <= 900) document.body.classList.remove('show-sidebar'); });
-      notesContainer.appendChild(noteRow);
-    });
-    el.appendChild(notesContainer);
-
-    // click selects folder
-    el.addEventListener('click', (e)=>{ const act = e.target && e.target.dataset && e.target.dataset.act; if(act) return; selectFolder(f.id); });
-
-    // rename inline
-    renameBtn.addEventListener('click',(e)=>{ e.stopPropagation(); startInlineFolderRename(el,f); });
-
-    // delete with modal
-    deleteBtn.addEventListener('click', async (e)=>{ e.stopPropagation(); const ok = await showConfirm('Delete folder "'+f.name+'" and its notes?'); if(!ok) return; delete notesMap[f.id]; folders = folders.filter(x=>x.id!==f.id); if(expandedFolders.has(f.id)){ expandedFolders.delete(f.id); saveExpandedState(); } if(!folders.length) folders=[{id:'f_general',name:'General'}]; if(currentFolderId===f.id) currentFolderId = folders[0].id; saveFolders(folders); saveNotesMap(notesMap); renderFolders(); loadNotes(); updateTagFilters(); });
-
-    // dragging
-    el.addEventListener('dragstart', ev=>{ ev.dataTransfer.setData('text/plain', f.id); ev.dataTransfer.effectAllowed='move'; el.classList.add('dragging'); });
-    el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
-    el.addEventListener('dragover', ev=>{ ev.preventDefault(); el.classList.add('drag-over'); });
-    el.addEventListener('dragleave', ()=> el.classList.remove('drag-over'));
-    el.addEventListener('drop', ev=>{
-      ev.preventDefault(); el.classList.remove('drag-over');
-      const src = ev.dataTransfer.getData('text/plain');
-      if(src){
-        const srcIdx = folders.findIndex(x=>x.id===src);
-        const tgtIdx = folders.findIndex(x=>x.id===f.id);
-        if(srcIdx>-1){ const [m]=folders.splice(srcIdx,1); folders.splice(tgtIdx,0,m); saveFolders(folders); renderFolders(); return; }
+    /* storage helpers */
+    function loadFolders() {
+      try {
+        const raw = localStorage.getItem('or_folders');
+        const arr = raw ? JSON.parse(raw) : null;
+        if (!arr || !Array.isArray(arr) || arr.length === 0) {
+          const base = [{ id: 'f_general', name: 'General' }];
+          localStorage.setItem('or_folders', JSON.stringify(base));
+          return base;
+        }
+        return arr;
+      } catch (e) {
+        const base = [{ id: 'f_general', name: 'General' }];
+        localStorage.setItem('or_folders', JSON.stringify(base));
+        return base;
       }
-      const noteData = ev.dataTransfer.getData('application/x-note');
-      if(noteData){ try{ const n = JSON.parse(noteData); moveNoteBetweenFolders(n.id,n.fromFolderId,f.id); expandedFolders.add(f.id); saveExpandedState(); renderFolders(); }catch(e){} }
-    });
+    }
+    function saveFolders(f) { localStorage.setItem('or_folders', JSON.stringify(f)); }
+    function loadNotesMap() { try { const raw = localStorage.getItem('or_notes'); return raw ? JSON.parse(raw) : {}; } catch (e) { return {}; } }
+    function saveNotesMap(map) { localStorage.setItem('or_notes', JSON.stringify(map)); window.dispatchEvent(new Event('or:notesChanged')); }
 
-    folderList.appendChild(el);
-  });
+    /* app state */
+    let folders = loadFolders();
+    let notesMap = loadNotesMap();
+    let currentFolderId = localStorage.getItem('or_currentFolder') || (folders[0] && folders[0].id);
+    if (!currentFolderId || !folders.find(f => f.id === currentFolderId)) currentFolderId = (folders[0] && folders[0].id);
 
-  folderCountEl.textContent = folders.length;
-  updateFolderHeader();
-}
+    function loadExpandedState() { try { const raw = localStorage.getItem('or_expandedFolders'); const arr = raw ? JSON.parse(raw) : []; return new Set(Array.isArray(arr) ? arr : []); } catch (e) { return new Set(); } }
+    function saveExpandedState() { try { localStorage.setItem('or_expandedFolders', JSON.stringify(Array.from(expandedFolders))); } catch (e) { } }
+    const expandedFolders = loadExpandedState();
 
-/* inline rename */
-function startInlineFolderRename(folderEl, folderObj){
-  cancelInlineEditor();
-  const nameDiv = folderEl.querySelector('.name');
-  const original = folderObj.name;
-  const input = document.createElement('input'); input.type='text'; input.className='folder-edit-input'; input.value = original; input.setAttribute('aria-label','Rename folder');
-  nameDiv.textContent=''; nameDiv.appendChild(input); input.focus(); input.select();
-  currentInlineEditor = { el: folderEl, input, folderObj, original, isNew:false };
-  function commit(){ const v=input.value.trim(); if(!v){ cancelInlineEditor(); renderFolders(); return; } folderObj.name=v; saveFolders(folders); currentInlineEditor=null; renderFolders(); }
-  function onKey(e){ if(e.key==='Enter'){ commit(); } else if(e.key==='Escape'){ cancelInlineEditor(); renderFolders(); } }
-  function onBlur(){ const v=input.value.trim(); if(v) commit(); else { cancelInlineEditor(); renderFolders(); } }
-  input.addEventListener('keydown', onKey); input.addEventListener('blur', onBlur);
-}
+    function escapeHtml(s) {
+      if (s === null || s === undefined) return '';
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[c]));
+    }
 
-/* create new folder */
-function startInlineNewFolder(){
-  let base='New folder', suffix=1, name=base;
-  const exists = n => folders.some(f=>f.name===n);
-  while(exists(name)){ suffix++; name = base + ' ' + suffix; }
-  const id = uid('f'); const f = { id, name };
-  folders.push(f); saveFolders(folders); currentFolderId = id; localStorage.setItem('or_currentFolder', id);
-  expandedFolders.add(id); saveExpandedState();
-  renderFolders();
-  const createdEl = folderList.querySelector(`.folder[data-id="${id}"]`);
-  if(createdEl){ startInlineFolderRename(createdEl, f); if(window.innerWidth <= 900) document.body.classList.add('show-sidebar'); }
-}
+    /* modal confirm */
+    function showConfirm(message) {
+      return new Promise(resolve => {
+        modalMessage.textContent = message;
+        modalBackdrop.style.display = 'flex';
+        modalOk.focus();
+        function clean(result) {
+          modalBackdrop.style.display = 'none';
+          modalOk.removeEventListener('click', onOk);
+          modalCancel.removeEventListener('click', onCancel);
+          modalBackdrop.removeEventListener('keydown', onKey);
+          resolve(result);
+        }
+        function onOk() { clean(true); }
+        function onCancel() { clean(false); }
+        function onKey(e) { if (e.key === 'Escape') onCancel(); if (e.key === 'Enter') onOk(); }
+        modalOk.addEventListener('click', onOk);
+        modalCancel.addEventListener('click', onCancel);
+        modalBackdrop.addEventListener('keydown', onKey);
+      });
+    }
 
-/* notes rendering */
-let notesRenderTimer = null;
-function loadNotes(){
-  notesGrid.classList.remove('fade-enter'); notesGrid.classList.add('fade-leave');
-  clearTimeout(notesRenderTimer);
-  notesRenderTimer = setTimeout(()=>{
-    notesGrid.classList.remove('fade-leave'); notesGrid.innerHTML='';
-    const arr = (notesMap[currentFolderId]||[]).slice().reverse();
-    const q = (searchInput.value||'').trim().toLowerCase();
-    const activeTags = Array.from(document.querySelectorAll('.tag-pill.active')).map(el=>el.textContent);
-    const filtered = arr.filter(n=>{ const byQ = !q || (n.title||'').toLowerCase().includes(q) || (n.text||'').toLowerCase().includes(q) || ((n.tags||[]).join(' ')).toLowerCase().includes(q); const byTag = activeTags.length===0 || (n.tags||[]).some(t=>activeTags.includes(t)); return byQ && byTag; });
-    filtered.forEach(n=>{
-      const card=document.createElement('div'); card.className='note-card'; card.draggable=true; card.dataset.id=n.id;
-      const excerpt=(n.text||'').slice(0,140);
-      card.innerHTML = `<div><div class="note-title">${escapeHtml(n.title||'Untitled')}</div><div class="note-body" style="color:var(--muted-text);font-size:13px">${escapeHtml(excerpt)}${(n.text||'').length>140?'…':''}</div></div><div class="note-meta"><div style="display:flex;gap:8px;align-items:center"><div style="font-size:12px;color:var(--muted-text)">${new Date(n.updated||n.created).toLocaleString()}</div></div><div class="note-actions"><button class="small-btn" data-act="open">Open</button><button class="small-btn" data-act="share">Share</button><button class="small-btn" data-act="delete">Delete</button></div></div><div class="note-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${escapeHtml(t)}</span>`).join('')}</div>`;
-      // open
-      card.querySelector('[data-act="open"]').addEventListener('click', ()=>openNoteForEdit(n.id));
-      // share -> download .md for this note
-      card.querySelector('[data-act="share"]').addEventListener('click', ()=>shareNote(n));
-      // delete
-      card.querySelector('[data-act="delete"]').addEventListener('click', async ()=>{ const ok = await showConfirm('Delete note "'+(n.title||'Untitled')+'"?' ); if(!ok) return; const arrAll = notesMap[currentFolderId]||[]; const idx = arrAll.findIndex(x=>x.id===n.id); if(idx>-1){ arrAll.splice(idx,1); saveNotesMap(notesMap); // broadcast deletion
-          try{ window.ORApp && window.ORApp.sendNoteMessage('deleted', { folderId: currentFolderId, id: n.id }); }catch(e){} loadNotes(); updateTagFilters(); } });
-      card.addEventListener('dblclick', ()=>openNoteForEdit(n.id));
-      card.addEventListener('dragstart', ev=>{ card.classList.add('dragging'); try{ ev.dataTransfer.setData('application/x-note', JSON.stringify({ id:n.id, fromFolderId: currentFolderId })); }catch(e){} ev.dataTransfer.effectAllowed='move'; });
-      card.addEventListener('dragend', ()=>card.classList.remove('dragging'));
-      notesGrid.appendChild(card);
-    });
-    notesCount.textContent = (notesMap[currentFolderId]||[]).length;
-    renderFolders();
-    notesGrid.classList.add('fade-enter'); setTimeout(()=>notesGrid.classList.remove('fade-enter'),380);
-  },120);
-}
+    /* configure marked */
+    marked.setOptions({ gfm: true, breaks: false, headerIds: true, mangle: false });
 
-/* share helper: download note as .md */
-async function shareNote(n){
-  try{
-    const title = n.title || 'Untitled';
-    const text = (n.text || '');
-    const payloadText = `# ${title}\n\n${text}`;
-    const safeTitle = (title || 'note').replace(/[^\w\-]+/g,'_').slice(0,60) || 'note';
-    const blob = new Blob([payloadText], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = safeTitle + '.md';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    // small ephemeral feedback
-    modalMessage.textContent = 'Downloaded note as .md';
-    modalBackdrop.style.display = 'flex';
-    setTimeout(()=> modalBackdrop.style.display = 'none', 1400);
-  }catch(e){
-    modalMessage.textContent = 'Could not download note';
-    modalBackdrop.style.display = 'flex';
-    setTimeout(()=> modalBackdrop.style.display = 'none', 1400);
-  }
-}
-
-/* Import markdown files into current folder */
-importBtn.addEventListener('click', ()=> mdFileInput.click());
-mdFileInput.addEventListener('change', async (e) => {
-  const files = Array.from(e.target.files || []);
-  if(files.length === 0) return;
-  const imported = [];
-  for(const file of files){
-    try{
-      const content = await file.text();
-      // derive title: prefer first markdown H1/ H2 heading, else filename without extension
-      const firstLine = (content.split(/\r?\n/).find(l => l.trim().length > 0) || '').trim();
-      const m = firstLine.match(/^#{1,6}\s+(.*)/);
-      let title = m && m[1] ? m[1].trim() : file.name.replace(/\.[^/.]+$/, '');
-      // ensure uniqueness in folder
-      let candidate = title || 'Untitled';
-      let suffix = 1;
-      while((notesMap[currentFolderId]||[]).some(n=>n.title === candidate)){
-        suffix++; candidate = `${title} ${suffix}`;
+    function renderPreview() {
+      const md = noteBody.value || '';
+      if (!md) { preview.innerHTML = '<em style="color:var(--muted-text)">Empty</em>'; return; }
+      try {
+        const raw = marked.parse(md);
+        preview.innerHTML = DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
+      } catch (e) {
+        preview.innerHTML = '<pre>' + escapeHtml(md) + '</pre>';
       }
+    }
+
+    /* inline editor handling */
+    let currentInlineEditor = null;
+    function cancelInlineEditor() {
+      if (!currentInlineEditor) return;
+      const { el, input, folderObj, original, isNew } = currentInlineEditor;
+      try {
+        if (isNew) { if (el && el.parentNode) el.parentNode.removeChild(el); }
+        else { if (el) { const nameDiv = el.querySelector('.name'); if (nameDiv) nameDiv.textContent = original || (folderObj && folderObj.name) || ''; } }
+      } catch (e) { }
+      currentInlineEditor = null;
+    }
+
+    /* open note from sidebar */
+    function openNoteGlobally(folderId, noteId) {
+      if (!folders.find(f => f.id === folderId)) return;
+      currentFolderId = folderId; localStorage.setItem('or_currentFolder', currentFolderId);
+      updateFolderHeader(); renderFolders(); loadNotes();
+      const arr = notesMap[folderId] || []; const n = arr.find(x => x.id === noteId);
+      if (n) { noteTitle.value = n.title; noteBody.value = n.text; tagInput.value = (n.tags || []).join(', '); saveNoteBtn.setAttribute('data-editing', noteId); renderPreview(); scrollToTop(); }
+    }
+
+    /* render folders */
+    function renderFolders() {
+      folderList.innerHTML = '';
+      folders.forEach((f, idx) => {
+        const el = document.createElement('div');
+        el.className = 'folder' + (f.id === currentFolderId ? ' active' : '');
+        el.draggable = true;
+        el.dataset.id = f.id;
+
+        const row = document.createElement('div'); row.className = 'folder-row';
+
+        const toggle = document.createElement('button'); toggle.className = 'folder-toggle';
+        const isExpanded = expandedFolders.has(f.id);
+        if (isExpanded) toggle.classList.add('expanded');
+        toggle.innerHTML = '<i class="bi bi-caret-right-fill"></i>'; toggle.setAttribute('aria-expanded', String(isExpanded));
+        toggle.addEventListener('click', e => { e.stopPropagation(); if (expandedFolders.has(f.id)) expandedFolders.delete(f.id); else expandedFolders.add(f.id); saveExpandedState(); renderFolders(); });
+
+        const nameDiv = document.createElement('div'); nameDiv.className = 'name'; nameDiv.textContent = f.name;
+        const countDiv = document.createElement('div'); countDiv.className = 'count'; countDiv.textContent = (notesMap[f.id] || []).length;
+
+        const actions = document.createElement('div'); actions.className = 'folder-actions';
+        const renameBtn = document.createElement('button'); renameBtn.setAttribute('title', 'Rename'); renameBtn.setAttribute('data-act', 'rename'); renameBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+        const deleteBtn = document.createElement('button'); deleteBtn.setAttribute('title', 'Delete'); deleteBtn.setAttribute('data-act', 'delete'); deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+        const grabDiv = document.createElement('div'); grabDiv.className = 'grab'; grabDiv.title = 'Drag to reorder'; grabDiv.innerHTML = '<i class="bi bi-list"></i>';
+        actions.appendChild(renameBtn); actions.appendChild(deleteBtn); actions.appendChild(grabDiv);
+
+        row.appendChild(toggle); row.appendChild(nameDiv); row.appendChild(countDiv); row.appendChild(actions);
+        el.appendChild(row);
+
+        // notes under folder
+        const notesContainer = document.createElement('div'); notesContainer.className = 'folder-notes' + (isExpanded ? ' show' : '');
+        const notesArr = (notesMap[f.id] || []).slice().reverse();
+        notesArr.forEach(n => {
+          const noteRow = document.createElement('div'); noteRow.className = 'folder-note';
+          const t = document.createElement('div'); t.className = 'title'; t.textContent = n.title || 'Untitled';
+          const m = document.createElement('div'); m.className = 'meta'; m.textContent = new Date(n.updated || n.created).toLocaleDateString();
+          noteRow.appendChild(t); noteRow.appendChild(m);
+          noteRow.addEventListener('click', ev => { ev.stopPropagation(); openNoteGlobally(f.id, n.id); if (window.innerWidth <= 900) document.body.classList.remove('show-sidebar'); });
+          notesContainer.appendChild(noteRow);
+        });
+        el.appendChild(notesContainer);
+
+        // click selects folder
+        el.addEventListener('click', (e) => { const act = e.target && e.target.dataset && e.target.dataset.act; if (act) return; selectFolder(f.id); });
+
+        // rename inline
+        renameBtn.addEventListener('click', (e) => { e.stopPropagation(); startInlineFolderRename(el, f); });
+
+        // delete with modal
+        deleteBtn.addEventListener('click', async (e) => { e.stopPropagation(); const ok = await showConfirm('Delete folder "' + f.name + '" and its notes?'); if (!ok) return; delete notesMap[f.id]; folders = folders.filter(x => x.id !== f.id); if (expandedFolders.has(f.id)) { expandedFolders.delete(f.id); saveExpandedState(); } if (!folders.length) folders = [{ id: 'f_general', name: 'General' }]; if (currentFolderId === f.id) currentFolderId = folders[0].id; saveFolders(folders); saveNotesMap(notesMap); renderFolders(); loadNotes(); updateTagFilters(); });
+
+        // dragging
+        el.addEventListener('dragstart', ev => { ev.dataTransfer.setData('text/plain', f.id); ev.dataTransfer.effectAllowed = 'move'; el.classList.add('dragging'); });
+        el.addEventListener('dragend', () => el.classList.remove('dragging'));
+        el.addEventListener('dragover', ev => { ev.preventDefault(); el.classList.add('drag-over'); });
+        el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+        el.addEventListener('drop', ev => {
+          ev.preventDefault(); el.classList.remove('drag-over');
+          const src = ev.dataTransfer.getData('text/plain');
+          if (src) {
+            const srcIdx = folders.findIndex(x => x.id === src);
+            const tgtIdx = folders.findIndex(x => x.id === f.id);
+            if (srcIdx > -1) { const [m] = folders.splice(srcIdx, 1); folders.splice(tgtIdx, 0, m); saveFolders(folders); renderFolders(); return; }
+          }
+          const noteData = ev.dataTransfer.getData('application/x-note');
+          if (noteData) { try { const n = JSON.parse(noteData); moveNoteBetweenFolders(n.id, n.fromFolderId, f.id); expandedFolders.add(f.id); saveExpandedState(); renderFolders(); } catch (e) { } }
+        });
+
+        folderList.appendChild(el);
+      });
+
+      folderCountEl.textContent = folders.length;
+      updateFolderHeader();
+    }
+
+    /* inline rename */
+    function startInlineFolderRename(folderEl, folderObj) {
+      cancelInlineEditor();
+      const nameDiv = folderEl.querySelector('.name');
+      const original = folderObj.name;
+      const input = document.createElement('input'); input.type = 'text'; input.className = 'folder-edit-input'; input.value = original; input.setAttribute('aria-label', 'Rename folder');
+      nameDiv.textContent = ''; nameDiv.appendChild(input); input.focus(); input.select();
+      currentInlineEditor = { el: folderEl, input, folderObj, original, isNew: false };
+      function commit() { const v = input.value.trim(); if (!v) { cancelInlineEditor(); renderFolders(); return; } folderObj.name = v; saveFolders(folders); currentInlineEditor = null; renderFolders(); }
+      function onKey(e) { if (e.key === 'Enter') { commit(); } else if (e.key === 'Escape') { cancelInlineEditor(); renderFolders(); } }
+      function onBlur() { const v = input.value.trim(); if (v) commit(); else { cancelInlineEditor(); renderFolders(); } }
+      input.addEventListener('keydown', onKey); input.addEventListener('blur', onBlur);
+    }
+
+    /* create new folder */
+    function startInlineNewFolder() {
+      let base = 'New folder', suffix = 1, name = base;
+      const exists = n => folders.some(f => f.name === n);
+      while (exists(name)) { suffix++; name = base + ' ' + suffix; }
+      const id = uid('f'); const f = { id, name };
+      folders.push(f); saveFolders(folders); currentFolderId = id; localStorage.setItem('or_currentFolder', id);
+      expandedFolders.add(id); saveExpandedState();
+      renderFolders();
+      const createdEl = folderList.querySelector(`.folder[data-id="${id}"]`);
+      if (createdEl) { startInlineFolderRename(createdEl, f); if (window.innerWidth <= 900) document.body.classList.add('show-sidebar'); }
+    }
+
+    /* notes rendering */
+    let notesRenderTimer = null;
+    function loadNotes() {
+      notesGrid.classList.remove('fade-enter'); notesGrid.classList.add('fade-leave');
+      clearTimeout(notesRenderTimer);
+      notesRenderTimer = setTimeout(() => {
+        notesGrid.classList.remove('fade-leave'); notesGrid.innerHTML = '';
+        const arr = (notesMap[currentFolderId] || []).slice().reverse();
+        const q = (searchInput.value || '').trim().toLowerCase();
+        const activeTags = Array.from(document.querySelectorAll('.tag-pill.active')).map(el => el.textContent);
+        const filtered = arr.filter(n => { const byQ = !q || (n.title || '').toLowerCase().includes(q) || (n.text || '').toLowerCase().includes(q) || ((n.tags || []).join(' ')).toLowerCase().includes(q); const byTag = activeTags.length === 0 || (n.tags || []).some(t => activeTags.includes(t)); return byQ && byTag; });
+        filtered.forEach(n => {
+          const card = document.createElement('div'); card.className = 'note-card'; card.draggable = true; card.dataset.id = n.id;
+          const excerpt = (n.text || '').slice(0, 140);
+          card.innerHTML = `<div><div class="note-title">${escapeHtml(n.title || 'Untitled')}</div><div class="note-body" style="color:var(--muted-text);font-size:13px">${escapeHtml(excerpt)}${(n.text || '').length > 140 ? '…' : ''}</div></div><div class="note-meta"><div style="display:flex;gap:8px;align-items:center"><div style="font-size:12px;color:var(--muted-text)">${new Date(n.updated || n.created).toLocaleString()}</div></div><div class="note-actions"><button class="small-btn" data-act="open">Open</button><button class="small-btn" data-act="share"><i class="bi bi-share"></i></button><button class="small-btn" data-act="delete"><i class="bi bi-trash"></i></button></div></div><div class="note-tags">${(n.tags || []).map(t => `<span class="note-tag">${escapeHtml(t)}</span>`).join('')}</div>`;
+          // open
+          card.querySelector('[data-act="open"]').addEventListener('click', () => openNoteForEdit(n.id));
+          // share -> download .md for this note
+          card.querySelector('[data-act="share"]').addEventListener('click', () => shareNote(n));
+          // delete
+          card.querySelector('[data-act="delete"]').addEventListener('click', async () => {
+            const ok = await showConfirm('Delete note "' + (n.title || 'Untitled') + '"?'); if (!ok) return; const arrAll = notesMap[currentFolderId] || []; const idx = arrAll.findIndex(x => x.id === n.id); if (idx > -1) {
+              arrAll.splice(idx, 1); saveNotesMap(notesMap); // broadcast deletion
+              try { window.ORApp && window.ORApp.sendNoteMessage('deleted', { folderId: currentFolderId, id: n.id }); } catch (e) { } loadNotes(); updateTagFilters();
+            }
+          });
+          card.addEventListener('dblclick', () => openNoteForEdit(n.id));
+          card.addEventListener('dragstart', ev => { card.classList.add('dragging'); try { ev.dataTransfer.setData('application/x-note', JSON.stringify({ id: n.id, fromFolderId: currentFolderId })); } catch (e) { } ev.dataTransfer.effectAllowed = 'move'; });
+          card.addEventListener('dragend', () => card.classList.remove('dragging'));
+          notesGrid.appendChild(card);
+        });
+        notesCount.textContent = (notesMap[currentFolderId] || []).length;
+        renderFolders();
+        notesGrid.classList.add('fade-enter'); setTimeout(() => notesGrid.classList.remove('fade-enter'), 380);
+      }, 120);
+    }
+
+    /* share helper: download note as .md */
+    async function shareNote(n) {
+      try {
+        const title = n.title || 'Untitled';
+        const text = (n.text || '');
+        const payloadText = `# ${title}\n\n${text}`;
+        const safeTitle = (title || 'note').replace(/[^\w\-]+/g, '_').slice(0, 60) || 'note';
+        const blob = new Blob([payloadText], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = safeTitle + '.md';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        // small ephemeral feedback
+        modalMessage.textContent = 'Downloaded note as .md';
+        modalBackdrop.style.display = 'flex';
+        setTimeout(() => modalBackdrop.style.display = 'none', 1400);
+      } catch (e) {
+        modalMessage.textContent = 'Could not download note';
+        modalBackdrop.style.display = 'flex';
+        setTimeout(() => modalBackdrop.style.display = 'none', 1400);
+      }
+    }
+
+    /* Import markdown files into current folder */
+    importBtn.addEventListener('click', () => mdFileInput.click());
+    mdFileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+      const imported = [];
+      for (const file of files) {
+        try {
+          const content = await file.text();
+          // derive title: prefer first markdown H1/ H2 heading, else filename without extension
+          const firstLine = (content.split(/\r?\n/).find(l => l.trim().length > 0) || '').trim();
+          const m = firstLine.match(/^#{1,6}\s+(.*)/);
+          let title = m && m[1] ? m[1].trim() : file.name.replace(/\.[^/.]+$/, '');
+          // ensure uniqueness in folder
+          let candidate = title || 'Untitled';
+          let suffix = 1;
+          while ((notesMap[currentFolderId] || []).some(n => n.title === candidate)) {
+            suffix++; candidate = `${title} ${suffix}`;
+          }
+          const id = uid('note');
+          const note = { id, title: candidate, text: content, tags: [], created: Date.now(), updated: Date.now() };
+          if (!notesMap[currentFolderId]) notesMap[currentFolderId] = [];
+          notesMap[currentFolderId].push(note);
+          saveNotesMap(notesMap);
+          // broadcast create so other tabs get it
+          try { window.ORApp && window.ORApp.sendNoteMessage('created', { folderId: currentFolderId, note }); } catch (e) { }
+          imported.push(file.name);
+        } catch (err) {
+          // ignore single-file errors but continue importing others
+          console.error('Import failed for', file.name, err);
+        }
+      }
+      loadNotes(); updateTagFilters();
+      modalMessage.textContent = `Imported ${imported.length} file(s): ${imported.join(', ')}`;
+      modalBackdrop.style.display = 'flex';
+      setTimeout(() => modalBackdrop.style.display = 'none', 2200);
+      // reset file input so same file can be re-picked later if desired
+      mdFileInput.value = '';
+    });
+
+    /* CRUD */
+    function createNote() {
+      if (!currentFolderId) return;
+      const title = (noteTitle.value || '').trim() || ((noteBody.value || '').split('\n')[0] || '').slice(0, 40) || 'Untitled';
+      const tags = parseTags(tagInput.value);
       const id = uid('note');
-      const note = { id, title: candidate, text: content, tags: [], created: Date.now(), updated: Date.now() };
-      if(!notesMap[currentFolderId]) notesMap[currentFolderId]=[];
+      const note = { id, title, text: noteBody.value || '', tags, created: Date.now(), updated: Date.now() };
+      if (!notesMap[currentFolderId]) notesMap[currentFolderId] = [];
       notesMap[currentFolderId].push(note);
       saveNotesMap(notesMap);
-      // broadcast create so other tabs get it
-      try{ window.ORApp && window.ORApp.sendNoteMessage('created', { folderId: currentFolderId, note }); }catch(e){}
-      imported.push(file.name);
-    }catch(err){
-      // ignore single-file errors but continue importing others
-      console.error('Import failed for', file.name, err);
+      // broadcast create
+      try { window.ORApp && window.ORApp.sendNoteMessage('created', { folderId: currentFolderId, note }); } catch (e) { }
+      noteTitle.value = ''; noteBody.value = ''; tagInput.value = '';
+      loadNotes(); updateTagFilters(); noteBody.focus();
     }
-  }
-  loadNotes(); updateTagFilters();
-  modalMessage.textContent = `Imported ${imported.length} file(s): ${imported.join(', ')}`;
-  modalBackdrop.style.display = 'flex';
-  setTimeout(()=> modalBackdrop.style.display = 'none', 2200);
-  // reset file input so same file can be re-picked later if desired
-  mdFileInput.value = '';
-});
+    function openNoteForEdit(noteId) {
+      const arr = notesMap[currentFolderId] || []; const n = arr.find(x => x.id === noteId); if (!n) return;
+      noteTitle.value = n.title; noteBody.value = n.text; tagInput.value = (n.tags || []).join(', '); saveNoteBtn.setAttribute('data-editing', noteId); renderPreview(); scrollToTop();
+    }
+    function updateNoteFromEditor() {
+      const editing = saveNoteBtn.getAttribute('data-editing'); const tags = parseTags(tagInput.value);
+      if (editing) {
+        const arr = notesMap[currentFolderId] || []; const idx = arr.findIndex(x => x.id === editing);
+        if (idx > -1) {
+          arr[idx].title = noteTitle.value || arr[idx].title; arr[idx].text = noteBody.value || ''; arr[idx].tags = tags; arr[idx].updated = Date.now(); saveNotesMap(notesMap); // broadcast update
+          try { window.ORApp && window.ORApp.sendNoteMessage('updated', { folderId: currentFolderId, note: arr[idx] }); } catch (e) { } saveNoteBtn.removeAttribute('data-editing');
+        }
+        else { createNote(); saveNoteBtn.removeAttribute('data-editing'); }
+      } else { createNote(); }
+      loadNotes(); updateTagFilters();
+    }
+    saveNoteBtn.addEventListener('click', () => updateNoteFromEditor());
 
-/* CRUD */
-function createNote(){
-  if(!currentFolderId) return;
-  const title = (noteTitle.value||'').trim() || ((noteBody.value||'').split('\n')[0]||'').slice(0,40) || 'Untitled';
-  const tags = parseTags(tagInput.value);
-  const id = uid('note');
-  const note = { id, title, text: noteBody.value||'', tags, created: Date.now(), updated: Date.now() };
-  if(!notesMap[currentFolderId]) notesMap[currentFolderId]=[];
-  notesMap[currentFolderId].push(note);
-  saveNotesMap(notesMap);
-  // broadcast create
-  try{ window.ORApp && window.ORApp.sendNoteMessage('created', { folderId: currentFolderId, note }); }catch(e){}
-  noteTitle.value=''; noteBody.value=''; tagInput.value='';
-  loadNotes(); updateTagFilters(); noteBody.focus();
-}
-function openNoteForEdit(noteId){
-  const arr = notesMap[currentFolderId]||[]; const n = arr.find(x=>x.id===noteId); if(!n) return;
-  noteTitle.value=n.title; noteBody.value=n.text; tagInput.value=(n.tags||[]).join(', '); saveNoteBtn.setAttribute('data-editing', noteId); renderPreview(); scrollToTop();
-}
-function updateNoteFromEditor(){
-  const editing = saveNoteBtn.getAttribute('data-editing'); const tags = parseTags(tagInput.value);
-  if(editing){
-    const arr = notesMap[currentFolderId]||[]; const idx = arr.findIndex(x=>x.id===editing);
-    if(idx>-1){ arr[idx].title = noteTitle.value || arr[idx].title; arr[idx].text = noteBody.value || ''; arr[idx].tags = tags; arr[idx].updated = Date.now(); saveNotesMap(notesMap); // broadcast update
-        try{ window.ORApp && window.ORApp.sendNoteMessage('updated', { folderId: currentFolderId, note: arr[idx] }); }catch(e){} saveNoteBtn.removeAttribute('data-editing'); }
-    else { createNote(); saveNoteBtn.removeAttribute('data-editing'); }
-  } else { createNote(); }
-  loadNotes(); updateTagFilters();
-}
-saveNoteBtn.addEventListener('click', ()=> updateNoteFromEditor());
+    function parseTags(s) { if (!s) return []; return s.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10); }
 
-function parseTags(s){ if(!s) return []; return s.split(',').map(x=>x.trim()).filter(Boolean).slice(0,10); }
+    /* move notes */
+    function moveNoteBetweenFolders(noteId, fromFolderId, toFolderId) {
+      if (fromFolderId === toFolderId) return;
+      const from = notesMap[fromFolderId] || []; const idx = from.findIndex(x => x.id === noteId);
+      if (idx === -1) return;
+      const [note] = from.splice(idx, 1);
+      if (!notesMap[toFolderId]) notesMap[toFolderId] = [];
+      notesMap[toFolderId].push(note);
+      saveNotesMap(notesMap);
+      expandedFolders.add(toFolderId); saveExpandedState();
+      // broadcast move
+      try { window.ORApp && window.ORApp.sendNoteMessage('moved', { fromFolderId, toFolderId, noteId }); } catch (e) { }
+      loadNotes(); updateTagFilters();
+    }
 
-/* move notes */
-function moveNoteBetweenFolders(noteId, fromFolderId, toFolderId){
-  if(fromFolderId===toFolderId) return;
-  const from = notesMap[fromFolderId]||[]; const idx = from.findIndex(x=>x.id===noteId);
-  if(idx===-1) return;
-  const [note] = from.splice(idx,1);
-  if(!notesMap[toFolderId]) notesMap[toFolderId]=[];
-  notesMap[toFolderId].push(note);
-  saveNotesMap(notesMap);
-  expandedFolders.add(toFolderId); saveExpandedState();
-  // broadcast move
-  try{ window.ORApp && window.ORApp.sendNoteMessage('moved', { fromFolderId, toFolderId, noteId }); }catch(e){}
-  loadNotes(); updateTagFilters();
-}
-
-/* toolbar actions already wired earlier */
-qsa('.md-btn').forEach(btn => btn.addEventListener('click', ()=>{ applyMdAction(btn.dataset.action); }));
-function applyMdAction(action){
-  const ta = noteBody; const start = ta.selectionStart, end = ta.selectionEnd; const val = ta.value; const selected = val.slice(start,end) || 'text';
-  let rep = '';
-  switch(action){
-    case 'bold': rep = `**${selected}**`; break;
-    case 'italic': rep = `*${selected}*`; break;
-    case 'h1': rep = `# ${selected}`; break;
-    case 'code': rep = '`'+selected+'`'; break;
-    case 'ul': rep = selected.split('\n').map(l=>l.trim()?'- '+l:l).join('\n'); break;
-    case 'link': rep = `[${selected}](https://)`; break;
-    default: rep = selected;
-  }
-  ta.setRangeText(rep, start, end, 'end'); ta.focus(); renderPreview();
-}
-
-noteBody.addEventListener('input', renderPreview);
-noteTitle.addEventListener('input', renderPreview);
-
-/* tag filters */
-function updateTagFilters(){
-  const allNotes = Object.values(notesMap).flat().filter(Boolean); const tagSet = new Set();
-  allNotes.forEach(n => (n.tags||[]).forEach(t=>tagSet.add(t)));
-  const tags = Array.from(tagSet).sort(); tagFilter.innerHTML='';
-  if(tags.length===0){ const el=document.createElement('div'); el.style.color='var(--muted-text)'; el.style.fontSize='13px'; el.textContent='No tags'; tagFilter.appendChild(el); return; }
-  tags.forEach(t=>{ const el=document.createElement('button'); el.className='tag-pill'; el.textContent=t; el.title='Filter by tag'; el.addEventListener('click',()=>{ el.classList.toggle('active'); loadNotes(); }); tagFilter.appendChild(el); });
-}
-
-/* new note */
-newNoteBtn.addEventListener('click', ()=>{ noteTitle.value=''; noteBody.value=''; tagInput.value=''; saveNoteBtn.removeAttribute('data-editing'); noteBody.focus(); renderPreview(); });
-
-/* search */
-searchInput.addEventListener('input', ()=> loadNotes());
-
-/* helpers */
-function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}); }
-
-/* initial render */
-renderFolders(); loadNotes(); updateTagFilters(); renderPreview();
-
-/* persist state on unload */
-window.addEventListener('beforeunload', ()=>{ saveFolders(folders); saveNotesMap(notesMap); localStorage.setItem('or_currentFolder', currentFolderId); saveExpandedState(); });
-
-/* select folder */
-function selectFolder(id){ if(!folders.find(f=>f.id===id)) return; currentFolderId=id; localStorage.setItem('or_currentFolder', id); updateFolderHeader(); renderFolders(); loadNotes(); }
-
-/* add folder click */
-addFolderBtn.addEventListener('click', (e)=>{ e.preventDefault(); startInlineNewFolder(); });
-
-/* mobile toggle */
-mobileFoldersBtn.addEventListener('click', ()=>{ document.body.classList.toggle('show-sidebar'); });
-
-/* drop note on main area */
-document.addEventListener('dragover', ev=>ev.preventDefault());
-document.addEventListener('drop', ev=>{
-  const d = ev.dataTransfer.getData('application/x-note'); if(!d) return;
-  try{ const noteObj = JSON.parse(d); const targetFolder = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.folder'); if(!targetFolder){ if(noteObj.fromFolderId && noteObj.fromFolderId !== currentFolderId) moveNoteBetweenFolders(noteObj.id, noteObj.fromFolderId, currentFolderId); } }catch(e){}
-});
-
-/* inline editor cancellation click-away */
-document.addEventListener('click', (e)=>{ if(!currentInlineEditor) return; const { input, el } = currentInlineEditor; if(!input) return; if(e.target===input) return; if(el.contains(e.target)) return; input.blur(); });
-
-/* update folder header */
-function updateFolderHeader(){ const f = folders.find(x=>x.id===currentFolderId); currentFolderName.textContent = f ? f.name : '(none)'; }
-
-/* Listen for cross-tab note messages (or:noteMessage fired by app.js when a BC/SW/storage message arrives) */
-window.addEventListener('or:noteMessage', (e) => {
-  const d = e.detail || {};
-  if(!d || !d.type) return;
-  const type = d.type; const payload = d.payload || {};
-
-  switch(type){
-    case 'note-created': {
-      const folderId = payload.folderId;
-      const note = payload.note;
-      if(!folderId || !note) return;
-      if(!notesMap[folderId]) notesMap[folderId]=[];
-      // avoid duplicates
-      if(!(notesMap[folderId]||[]).some(n => n.id === note.id)){
-        notesMap[folderId].push(note);
-        saveNotesMap(notesMap);
-        loadNotes();
-        updateTagFilters();
+    /* toolbar actions already wired earlier */
+    qsa('.md-btn').forEach(btn => btn.addEventListener('click', () => { applyMdAction(btn.dataset.action); }));
+    function applyMdAction(action) {
+      const ta = noteBody; const start = ta.selectionStart, end = ta.selectionEnd; const val = ta.value; const selected = val.slice(start, end) || 'text';
+      let rep = '';
+      switch (action) {
+        case 'bold': rep = `**${selected}**`; break;
+        case 'italic': rep = `*${selected}*`; break;
+        case 'h1': rep = `# ${selected}`; break;
+        case 'code': rep = '`' + selected + '`'; break;
+        case 'ul': rep = selected.split('\n').map(l => l.trim() ? '- ' + l : l).join('\n'); break;
+        case 'link': rep = `[${selected}](https://)`; break;
+        default: rep = selected;
       }
-      break;
+      ta.setRangeText(rep, start, end, 'end'); ta.focus(); renderPreview();
     }
-    case 'note-updated': {
-      const folderId = payload.folderId;
-      const note = payload.note;
-      if(!folderId || !note) return;
-      const arr = notesMap[folderId] || [];
-      const idx = arr.findIndex(x=>x.id === note.id);
-      if(idx > -1){
-        // if user is editing this same note, check for conflicts
-        const editing = saveNoteBtn.getAttribute('data-editing');
-        if(editing === note.id){
-          // if local differs from remote, ask user
-          const localText = noteBody.value || '';
-          const localTitle = noteTitle.value || '';
-          const remoteText = note.text || '';
-          const remoteTitle = note.title || '';
-          if(localText !== remoteText || localTitle !== remoteTitle){
-            showConfirm('This note was updated in another tab. Overwrite your local edits with the remote version?').then(ok=>{
-              if(ok){
-                arr[idx] = note;
-                saveNotesMap(notesMap);
-                // apply remote into editor
-                if(currentFolderId === folderId){
-                  noteTitle.value = note.title;
-                  noteBody.value = note.text;
-                  tagInput.value = (note.tags||[]).join(', ');
-                  renderPreview();
-                  loadNotes();
-                  updateTagFilters();
-                }
-              } else {
-                // keep local; still update stored version so when user saves it'll broadcast; do not overwrite
-              }
-            });
-          } else {
-            // identical, simply update timestamp
-            arr[idx] = note;
+
+    noteBody.addEventListener('input', renderPreview);
+    noteTitle.addEventListener('input', renderPreview);
+
+    /* tag filters */
+    function updateTagFilters() {
+      const allNotes = Object.values(notesMap).flat().filter(Boolean); const tagSet = new Set();
+      allNotes.forEach(n => (n.tags || []).forEach(t => tagSet.add(t)));
+      const tags = Array.from(tagSet).sort(); tagFilter.innerHTML = '';
+      if (tags.length === 0) { const el = document.createElement('div'); el.style.color = 'var(--muted-text)'; el.style.fontSize = '13px'; el.textContent = 'No tags'; tagFilter.appendChild(el); return; }
+      tags.forEach(t => { const el = document.createElement('button'); el.className = 'tag-pill'; el.textContent = t; el.title = 'Filter by tag'; el.addEventListener('click', () => { el.classList.toggle('active'); loadNotes(); }); tagFilter.appendChild(el); });
+    }
+
+    /* new note */
+    newNoteBtn.addEventListener('click', () => { noteTitle.value = ''; noteBody.value = ''; tagInput.value = ''; saveNoteBtn.removeAttribute('data-editing'); noteBody.focus(); renderPreview(); });
+
+    /* search */
+    searchInput.addEventListener('input', () => loadNotes());
+
+    /* helpers */
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    /* initial render */
+    renderFolders(); loadNotes(); updateTagFilters(); renderPreview();
+
+    /* persist state on unload */
+    window.addEventListener('beforeunload', () => { saveFolders(folders); saveNotesMap(notesMap); localStorage.setItem('or_currentFolder', currentFolderId); saveExpandedState(); });
+
+    /* select folder */
+    function selectFolder(id) { if (!folders.find(f => f.id === id)) return; currentFolderId = id; localStorage.setItem('or_currentFolder', id); updateFolderHeader(); renderFolders(); loadNotes(); }
+
+    /* add folder click */
+    addFolderBtn.addEventListener('click', (e) => { e.preventDefault(); startInlineNewFolder(); });
+
+    /* mobile toggle */
+    mobileFoldersBtn.addEventListener('click', () => { document.body.classList.toggle('show-sidebar'); });
+
+    /* drop note on main area */
+    document.addEventListener('dragover', ev => ev.preventDefault());
+    document.addEventListener('drop', ev => {
+      const d = ev.dataTransfer.getData('application/x-note'); if (!d) return;
+      try { const noteObj = JSON.parse(d); const targetFolder = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.folder'); if (!targetFolder) { if (noteObj.fromFolderId && noteObj.fromFolderId !== currentFolderId) moveNoteBetweenFolders(noteObj.id, noteObj.fromFolderId, currentFolderId); } } catch (e) { }
+    });
+
+    /* inline editor cancellation click-away */
+    document.addEventListener('click', (e) => { if (!currentInlineEditor) return; const { input, el } = currentInlineEditor; if (!input) return; if (e.target === input) return; if (el.contains(e.target)) return; input.blur(); });
+
+    /* update folder header */
+    function updateFolderHeader() { const f = folders.find(x => x.id === currentFolderId); currentFolderName.textContent = f ? f.name : '(none)'; }
+
+    /* Listen for cross-tab note messages (or:noteMessage fired by app.js when a BC/SW/storage message arrives) */
+    window.addEventListener('or:noteMessage', (e) => {
+      const d = e.detail || {};
+      if (!d || !d.type) return;
+      const type = d.type; const payload = d.payload || {};
+
+      switch (type) {
+        case 'note-created': {
+          const folderId = payload.folderId;
+          const note = payload.note;
+          if (!folderId || !note) return;
+          if (!notesMap[folderId]) notesMap[folderId] = [];
+          // avoid duplicates
+          if (!(notesMap[folderId] || []).some(n => n.id === note.id)) {
+            notesMap[folderId].push(note);
             saveNotesMap(notesMap);
             loadNotes();
             updateTagFilters();
           }
-        } else {
-          // not actively editing, just update store and UI
-          arr[idx] = note;
-          saveNotesMap(notesMap);
-          loadNotes();
-          updateTagFilters();
+          break;
         }
-      } else {
-        // new to this tab — add it
-        if(!notesMap[folderId]) notesMap[folderId]=[];
-        notesMap[folderId].push(note);
-        saveNotesMap(notesMap);
-        loadNotes();
-        updateTagFilters();
+        case 'note-updated': {
+          const folderId = payload.folderId;
+          const note = payload.note;
+          if (!folderId || !note) return;
+          const arr = notesMap[folderId] || [];
+          const idx = arr.findIndex(x => x.id === note.id);
+          if (idx > -1) {
+            // if user is editing this same note, check for conflicts
+            const editing = saveNoteBtn.getAttribute('data-editing');
+            if (editing === note.id) {
+              // if local differs from remote, ask user
+              const localText = noteBody.value || '';
+              const localTitle = noteTitle.value || '';
+              const remoteText = note.text || '';
+              const remoteTitle = note.title || '';
+              if (localText !== remoteText || localTitle !== remoteTitle) {
+                showConfirm('This note was updated in another tab. Overwrite your local edits with the remote version?').then(ok => {
+                  if (ok) {
+                    arr[idx] = note;
+                    saveNotesMap(notesMap);
+                    // apply remote into editor
+                    if (currentFolderId === folderId) {
+                      noteTitle.value = note.title;
+                      noteBody.value = note.text;
+                      tagInput.value = (note.tags || []).join(', ');
+                      renderPreview();
+                      loadNotes();
+                      updateTagFilters();
+                    }
+                  } else {
+                    // keep local; still update stored version so when user saves it'll broadcast; do not overwrite
+                  }
+                });
+              } else {
+                // identical, simply update timestamp
+                arr[idx] = note;
+                saveNotesMap(notesMap);
+                loadNotes();
+                updateTagFilters();
+              }
+            } else {
+              // not actively editing, just update store and UI
+              arr[idx] = note;
+              saveNotesMap(notesMap);
+              loadNotes();
+              updateTagFilters();
+            }
+          } else {
+            // new to this tab — add it
+            if (!notesMap[folderId]) notesMap[folderId] = [];
+            notesMap[folderId].push(note);
+            saveNotesMap(notesMap);
+            loadNotes();
+            updateTagFilters();
+          }
+          break;
+        }
+        case 'note-deleted': {
+          const folderId = payload.folderId;
+          const id = payload.id;
+          if (!folderId || !id) return;
+          const arr = notesMap[folderId] || [];
+          const idx = arr.findIndex(x => x.id === id);
+          if (idx > -1) { arr.splice(idx, 1); saveNotesMap(notesMap); loadNotes(); updateTagFilters(); }
+          break;
+        }
+        case 'note-moved': {
+          const { fromFolderId, toFolderId, noteId } = payload;
+          if (!fromFolderId || !toFolderId || !noteId) return;
+          const from = notesMap[fromFolderId] || [];
+          const idx = from.findIndex(x => x.id === noteId);
+          if (idx > -1) {
+            const [note] = from.splice(idx, 1);
+            if (!notesMap[toFolderId]) notesMap[toFolderId] = [];
+            notesMap[toFolderId].push(note);
+            saveNotesMap(notesMap);
+            loadNotes(); updateTagFilters();
+          }
+          break;
+        }
       }
-      break;
-    }
-    case 'note-deleted': {
-      const folderId = payload.folderId;
-      const id = payload.id;
-      if(!folderId || !id) return;
-      const arr = notesMap[folderId] || [];
-      const idx = arr.findIndex(x=>x.id === id);
-      if(idx>-1){ arr.splice(idx,1); saveNotesMap(notesMap); loadNotes(); updateTagFilters(); }
-      break;
-    }
-    case 'note-moved': {
-      const { fromFolderId, toFolderId, noteId } = payload;
-      if(!fromFolderId || !toFolderId || !noteId) return;
-      const from = notesMap[fromFolderId] || [];
-      const idx = from.findIndex(x=>x.id === noteId);
-      if(idx>-1){
-        const [note] = from.splice(idx,1);
-        if(!notesMap[toFolderId]) notesMap[toFolderId] = [];
-        notesMap[toFolderId].push(note);
-        saveNotesMap(notesMap);
-        loadNotes(); updateTagFilters();
-      }
-      break;
-    }
-  }
-});
-
-/* updateTagFilters call is used across app */
-
-/* Expose small API for debugging */
-window.orNotebook = { folders, notesMap, renderFolders, loadNotes, expandedFolders };
-
-/* Service worker registration (simple offline caching) */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> {
-    navigator.serviceWorker.register('service-worker.js').then(reg=>{
-      console.log('ServiceWorker registered', reg.scope);
-    }).catch(err=>{
-      console.warn('ServiceWorker failed to register', err);
     });
-  });
-}
-</script>
+
+    /* updateTagFilters call is used across app */
+
+    /* Expose small API for debugging */
+    window.orNotebook = { folders, notesMap, renderFolders, loadNotes, expandedFolders };
+
+    /* Service worker registration (simple offline caching) */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').then(reg => {
+          console.log('ServiceWorker registered', reg.scope);
+        }).catch(err => {
+          console.warn('ServiceWorker failed to register', err);
+        });
+      });
+    }
+  </script>
 
 </body>
+
 </html>
